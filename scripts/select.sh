@@ -44,7 +44,12 @@ do
         then
             continue
         fi
-        cer=$(curl https://$ip 2>&1 | grep -Po "'\S*'" |head -1|cut -d \' -f 2)
+        if [ $(uname) = "Darwin" ]
+        then
+            cer=$(wget https://$ip 2>&1 | grep "common name" | grep -Po "'\S*'" |head -1|cut -d \' -f 2)
+        else
+            cer=$(curl https://$ip 2>&1 | grep -Po "'\S*'" |head -1|cut -d \' -f 2)
+        fi
         if [ "$cer" != $domain ]
         then
             continue
@@ -57,7 +62,7 @@ do
             then
                 continue
             fi
-            c=$(nmap --host-timeout 2s $ip -p 5222 2>/dev/null | grep -Pc "5222/tcp open")
+            c=$(nmap --host-timeout 9s $ip -p 5222 2>/dev/null | grep -Pc "5222/tcp open")
             if [ $c -eq 1 ]
             then
                 continue
